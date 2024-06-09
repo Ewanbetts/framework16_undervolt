@@ -1,9 +1,9 @@
 #!/bin/bash
 set -eu
 
-status=$(</home/deck/.local/bin/statusadj.txt)
-allow=$(</home/deck/.local/bin/allowadj.txt)
-experimental=$(</home/deck/.local/bin/experimentaladj.txt)
+status=$(<"$HOME"/.local/bin/statusadj.txt)
+allow=$(<"$HOME"/.local/bin/allowadj.txt)
+experimental=$(<"$HOME"/.local/bin/experimentaladj.txt)
 
 # https://github.com/NGnius/PowerTools/issues/84#issuecomment-1482736698
 # https://www.amd.com/system/files/documents/faq-curve-optimizer.pdf
@@ -13,7 +13,7 @@ if [[ $allow = "1" ]]
 then
     if [[ $experimental = "1" ]]
     then
-        echo "0" > /home/deck/.local/bin/experimentaladj.txt
+        echo "0" > "$HOME"/.local/bin/experimentaladj.txt
 
         # EXPERIMENTAL SECTION
         # Put experimental settings here - these
@@ -21,20 +21,20 @@ then
 
         # CPU
         # 0x100000 - 15 (Range: -30, 30)
-        /home/deck/.local/bin/ryzenadj --set-coall=0xFFFF0
+        "$HOME"/.local/bin/ryzenadj --set-coall=0xFFFF0
 
         # GPU (Currently not working!)
         # 0x100000 - 15 (Range: -30, 30)
-        # /home/deck/.local/bin/ryzenadj --set-cogfx=0xFFFF0
+        # "$HOME"/.local/bin/ryzenadj --set-cogfx=0xFFFF0
 
-        echo "Experimental on" > /home/deck/.local/bin/statusadj.txt
+        echo "Experimental on" > "$HOME"/.local/bin/statusadj.txt
     else
         # Fail safe to avoid repeated crashes at startup
         if [[ $status = "Applying undervolt" ]]
         then
             echo "WARNING: Last apply failed or still in progress - skipping"
         else
-            echo "Applying undervolt" > /home/deck/.local/bin/statusadj.txt
+            echo "Applying undervolt" > "$HOME"/.local/bin/statusadj.txt
 
             # UNDERVOLT-ON SECTION
             # Put verified settings here.
@@ -44,20 +44,20 @@ then
 
             # CPU
             # 0x100000 - 5 (Range: -30, 30)
-            /home/deck/.local/bin/ryzenadj --set-coall=0xFFFFB
+            "$HOME"/.local/bin/ryzenadj --set-coall=0xFFFFB
 
             # GPU (Currently not working!)
             # 0x100000 - 5 (Range: -30, 30)
-            # /home/deck/.local/bin/ryzenadj --set-cogfx=0xFFFFB
+            # "$HOME"/.local/bin/ryzenadj --set-cogfx=0xFFFFB
 
             # Wait 10 seconds before declaring the undervolt a success
             sleep 10
 
             # Only update status if still applying...
-            status=$(</home/deck/.local/bin/statusadj.txt)
+            status=$(<"$HOME"/.local/bin/statusadj.txt)
             if [[ $status = "Applying undervolt" ]]
             then
-                echo "Undervolt on" > /home/deck/.local/bin/statusadj.txt
+                echo "Undervolt on" > "$HOME"/.local/bin/statusadj.txt
             fi
         fi
     fi
@@ -69,11 +69,11 @@ else
 
     # CPU
     # 0x100000 - 0
-    /home/deck/.local/bin/ryzenadj --set-coall=0x100000
+    "$HOME"/.local/bin/ryzenadj --set-coall=0x100000
 
     # GPU (Currently not working!)
     # 0x100000 - 0
-    # /home/deck/.local/bin/ryzenadj --set-cogfx=0x100000
+    # "$HOME"/.local/bin/ryzenadj --set-cogfx=0x100000
 
-    echo "Undervolt off" > /home/deck/.local/bin/statusadj.txt
+    echo "Undervolt off" > "$HOME"/.local/bin/statusadj.txt
 fi

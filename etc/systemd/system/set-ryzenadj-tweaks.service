@@ -3,7 +3,7 @@ Description=RyzenAdj Tweaks
 After=suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target ac.target battery.target
 
 [Service]
-ExecStart=/home/deck/.local/bin/set-ryzenadj-tweaks.sh
+ExecStart="$HOME"/.local/bin/set-ryzenadj-tweaks.sh
 Type=oneshot
 
 [Install]
