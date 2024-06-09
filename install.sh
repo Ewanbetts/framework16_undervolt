@@ -26,7 +26,9 @@ cp_file $fromPath "$toPath" "statusadj.txt"
 
 # Function to run cp_file with sudo
 sudo_cp_file() {
-    sudo sh -c "$(declare -f cp_file); cp_file $1 $2 $3"
+    sudo sh -c 'cp() {
+        cp "${1}${3}" "${2}${3}"
+    }; cp "$1" "$2" "$3"'
 }
 
 # Install system files with sudo
