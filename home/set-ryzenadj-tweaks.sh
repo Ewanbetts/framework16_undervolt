@@ -21,11 +21,11 @@ then
 
         # CPU
         # 0x100000 - 15 (Range: -30, 30)
-        "$HOME"/.local/bin/ryzenadj --set-coall=0xFFFF0
+        ryzenadj --set-coall=0xFFFF0
 
         # GPU (Currently not working!)
         # 0x100000 - 15 (Range: -30, 30)
-        # "$HOME"/.local/bin/ryzenadj --set-cogfx=0xFFFF0
+        # ryzenadj --set-cogfx=0xFFFF0
 
         echo "Experimental on" > "$HOME"/.local/bin/statusadj.txt
     else
@@ -44,11 +44,11 @@ then
 
             # CPU
             # 0x100000 - 5 (Range: -30, 30)
-            "$HOME"/.local/bin/ryzenadj --set-coall=0xFFFFB
+            ryzenadj --set-coall=0xFFFFB
 
             # GPU (Currently not working!)
             # 0x100000 - 5 (Range: -30, 30)
-            # "$HOME"/.local/bin/ryzenadj --set-cogfx=0xFFFFB
+            # ryzenadj --set-cogfx=0xFFFFB
 
             # Wait 10 seconds before declaring the undervolt a success
             sleep 10
@@ -69,11 +69,11 @@ else
 
     # CPU
     # 0x100000 - 0
-    "$HOME"/.local/bin/ryzenadj --set-coall=0x100000
+    ryzenadj --set-coall=0x100000
 
     # GPU (Currently not working!)
     # 0x100000 - 0
-    # "$HOME"/.local/bin/ryzenadj --set-cogfx=0x100000
+    # ryzenadj --set-cogfx=0x100000
 
     echo "Undervolt off" > "$HOME"/.local/bin/statusadj.txt
 fi
