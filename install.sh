@@ -1,21 +1,58 @@
-#!/bin/sh
+#!/usr/bin/env bash
 set -eu
 
-cp_file() {
+cp_file()
+{
     cp "${1}${3}" "${2}${3}"
 }
 
-# Check if sudo is available
-if ! command -v sudo >/dev/null 2>&1; then
-    echo "sudo is required but it's not installed. Please install sudo and try again."
+# Check for root privileges
+if [ "$(id -u)" != "0" ]
+then
+    echo "This script must be run with root privileges"
     exit 1
 fi
+
+# Function to replace home directory placeholder in file
+replace_home_in_file() {
+    sed "s|__HOME__|$HOME|g" "$1" > "$2"
+}
+
+# Function to list available directories in /home and prompt user to choose one
+choose_home_directory() {
+    echo "Available directories in /home:"
+    select dir in /home/*; do
+        if [ -n "$dir" ]; then
+            echo "You have selected: $dir"
+            read -p "Do you want to proceed with this directory as the new HOME? (y/n): " confirm
+            case $confirm in
+                [Yy]* )
+                    export HOME="$dir"
+                    break
+                    ;;
+                [Nn]* )
+                    echo "Please select a different directory."
+                    ;;
+                * )
+                    echo "Please answer yes or no."
+                    ;;
+            esac
+        else
+            echo "Invalid selection. Please try again."
+        fi
+    done
+}
+
+# Call the function to choose home directory
+choose_home_directory
+echo "The new HOME directory is: $HOME"
 
 # Install files in the user's home directory
 echo "Installing files in the user's home directory..."
 fromPath="home/"
 toPath="$HOME/.local/bin/"
 mkdir -p "$toPath"
+
 cp_file $fromPath "$toPath" "allowadj.txt"
 cp_file $fromPath "$toPath" "experimental.sh"
 cp_file $fromPath "$toPath" "experimentaladj.txt"
@@ -24,49 +61,46 @@ cp_file $fromPath "$toPath" "on.sh"
 cp_file $fromPath "$toPath" "set-ryzenadj-tweaks.sh"
 cp_file $fromPath "$toPath" "statusadj.txt"
 
-# Function to run cp_file with sudo
-sudo_cp_file() {
-    sudo sh -c 'cp() {
-        cp "${1}${3}" "${2}${3}"
-    }; cp "$1" "$2" "$3"'
-}
-
-# Install system files with sudo
+# Install system files
 echo "Installing system files with root privileges..."
-fromPath="./etc/systemd/system/"
+fromPath="etc/systemd/system/"
 toPath="/etc/systemd/system/"
-sudo_cp_file $fromPath $toPath "ac.target"
-sudo_cp_file $fromPath $toPath "battery.target"
-sudo_cp_file $fromPath $toPath "set-ryzenadj-tweaks.path"
-sudo_cp_file $fromPath $toPath "set-ryzenadj-tweaks.service"
 
-fromPath="./etc/udev/rules.d/"
+# Replace home directory in templates and copy
+replace_home_in_file "${fromPath}set-ryzenadj-tweaks.path.template" "/tmp/set-ryzenadj-tweaks.path"
+replace_home_in_file "${fromPath}set-ryzenadj-tweaks.service.template" "/tmp/set-ryzenadj-tweaks.service"
+cp "/tmp/set-ryzenadj-tweaks.path" "${toPath}set-ryzenadj-tweaks.path"
+cp "/tmp/set-ryzenadj-tweaks.service" "${toPath}set-ryzenadj-tweaks.service"
+cp_file $fromPath $toPath "ac.target"
+cp_file $fromPath $toPath "battery.target"
+
+
+fromPath="etc/udev/rules.d/"
 toPath="/etc/udev/rules.d/"
-sudo_cp_file $fromPath $toPath "99-powertargets.rules"
+cp_file $fromPath $toPath "99-powertargets.rules"
 
-# Set permissions on files
 echo "Set permissions on files..."
+toPath="$HOME/.local/bin/"
 chmod 666 "$toPath""allowadj.txt"
 chmod 666 "$toPath""experimentaladj.txt"
 chmod 755 "$toPath""experimental.sh"
 chmod 755 "$toPath""on.sh"
 chmod 755 "$toPath""off.sh"
 
-# Ensure undervolt is off
 echo "Ensuring undervolt is off..."
 bash "$toPath""off.sh"
 
 # Enable new powertarget rules with sudo
 echo "Enable new powertarget rules..."
-sudo udevadm control --reload-rules
+udevadm control --reload-rules
 
-# Enable path listener with sudo
+# Enable path listener
 echo "Enable path listener..."
-sudo systemctl enable --now set-ryzenadj-tweaks.path
+systemctl enable --now set-ryzenadj-tweaks.path
 
 # Enable set-ryzenadj-tweaks service with sudo
 echo "Enabling set-ryzenadj-tweaks service..."
-sudo systemctl enable set-ryzenadj-tweaks.service
+systemctl enable set-ryzenadj-tweaks.service
 
 echo "Installation done."
 echo ""
