@@ -1,5 +1,5 @@
 [Path]
-PathChanged=__HOME__/.local/bin/allowadj.txt
+PathChanged=__HOME__/.local/share/ryzen_uv/allowadj.txt
 
 [Install]
 WantedBy=multi-user.target

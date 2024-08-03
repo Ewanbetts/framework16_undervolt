@@ -45,12 +45,12 @@ choose_home_directory() {
 
 # Call the function to choose home directory
 choose_home_directory
-echo "The new HOME directory is: $HOME"
+echo "The HOME directory chosen is: $HOME"
 
 # Install files in the user's home directory
-echo "Installing files in the user's home directory..."
+echo "Installing files in $HOME..."
 fromPath="home/"
-toPath="$HOME/.local/bin/"
+toPath="$HOME/.local/share/ryzen_uv/"
 mkdir -p "$toPath"
 
 cp_file $fromPath "$toPath" "allowadj.txt"
@@ -58,8 +58,11 @@ cp_file $fromPath "$toPath" "experimental.sh"
 cp_file $fromPath "$toPath" "experimentaladj.txt"
 cp_file $fromPath "$toPath" "off.sh"
 cp_file $fromPath "$toPath" "on.sh"
-cp_file $fromPath "$toPath" "set-ryzenadj-tweaks.sh"
 cp_file $fromPath "$toPath" "statusadj.txt"
+
+# Replace home directory in target script and copy
+replace_home_in_file "${fromPath}set-ryzenadj-tweaks.sh" "/tmp/set-ryzenadj-tweaks.sh"
+cp "/tmp/set-ryzenadj-tweaks.sh" "$HOME/.local/share/ryzen_uv/set-ryzenadj-tweaks.sh"
 
 # Install system files
 echo "Installing system files with root privileges..."
@@ -73,7 +76,6 @@ cp "/tmp/set-ryzenadj-tweaks.path" "${toPath}set-ryzenadj-tweaks.path"
 cp "/tmp/set-ryzenadj-tweaks.service" "${toPath}set-ryzenadj-tweaks.service"
 cp_file $fromPath $toPath "ac.target"
 cp_file $fromPath $toPath "battery.target"
-
 
 fromPath="etc/udev/rules.d/"
 toPath="/etc/udev/rules.d/"
@@ -115,7 +117,7 @@ echo ""
 echo "If the experimental setting also works fine you can edit"
 echo "the undervolt settings in the 'experimental' and"
 echo "'undervolt-on' sections of"
-echo "$HOME/.local/bin/set-ryzenadj-tweaks.sh"
+echo "$HOME/.local/share/ryzen_uv/set-ryzenadj-tweaks.sh"
 echo "script moving the -15 curve offset to the 'undervolt-on'"
 echo "section and making a more ambitious setting for the"
 echo "'experimental' section, e.g., a -20 curve offset."
@@ -128,7 +130,7 @@ echo "setting and put that on the 'undervolt-on' section."
 echo ""
 echo "If something goes wrong and the deck hangs while applying"
 echo "undervolt then all further undervolting attempts are"
-echo "disabled. The file '$HOME/.local/bin/statusadj.txt'"
+echo "disabled. The file '$HOME/.local/share/ryzen_uv/statusadj.txt'"
 echo "acts as a fail safe. It will contain the text"
 echo "'Applying undervolt' after a failed restart. Make a less"
 echo "ambitious undervolt setting and clear the contents of the"

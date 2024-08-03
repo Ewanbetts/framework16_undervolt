@@ -16,7 +16,7 @@ echo "Disable path listener..."
 systemctl disable set-ryzenadj-tweaks.path
 
 echo "Removing files..."
-remPath="$HOME/.local/bin/"
+remPath="$HOME/.local/share/ryzen_uv/"
 rm "$remPath""allowadj.txt"
 rm "$remPath""experimental.sh"
 rm "$remPath""experimentaladj.txt"

@@ -1,9 +1,11 @@
 #!/bin/bash
 set -eu
 
-status=$(<"$HOME"/.local/bin/statusadj.txt)
-allow=$(<"$HOME"/.local/bin/allowadj.txt)
-experimental=$(<"$HOME"/.local/bin/experimentaladj.txt)
+RYZEN_UV_DIR="$HOME/.local/share/ryzen_uv"
+
+status=$(<"$RYZEN_UV_DIR/statusadj.txt")
+allow=$(<"$RYZEN_UV_DIR/allowadj.txt")
+experimental=$(<"$RYZEN_UV_DIR/experimentaladj.txt")
 
 # https://github.com/NGnius/PowerTools/issues/84#issuecomment-1482736698
 # https://www.amd.com/system/files/documents/faq-curve-optimizer.pdf
@@ -13,7 +15,7 @@ if [[ $allow = "1" ]]
 then
     if [[ $experimental = "1" ]]
     then
-        echo "0" > "$HOME"/.local/bin/experimentaladj.txt
+        echo "0" > "$HOME"/.local/share/ryzen_uv/experimentaladj.txt
 
         # EXPERIMENTAL SECTION
         # Put experimental settings here - these
@@ -27,14 +29,14 @@ then
         # 0x100000 - 15 (Range: -30, 30)
         # ryzenadj --set-cogfx=0xFFFF0
 
-        echo "Experimental on" > "$HOME"/.local/bin/statusadj.txt
+        echo "Experimental on" > "$HOME"/.local/share/ryzen_uv/statusadj.txt
     else
         # Fail safe to avoid repeated crashes at startup
         if [[ $status = "Applying undervolt" ]]
         then
             echo "WARNING: Last apply failed or still in progress - skipping"
         else
-            echo "Applying undervolt" > "$HOME"/.local/bin/statusadj.txt
+            echo "Applying undervolt" > "$HOME"/.local/share/ryzen_uv/statusadj.txt
 
             # UNDERVOLT-ON SECTION
             # Put verified settings here.
@@ -54,10 +56,10 @@ then
             sleep 10
 
             # Only update status if still applying...
-            status=$(<"$HOME"/.local/bin/statusadj.txt)
+            status=$(<"$HOME"/.local/share/ryzen_uv/statusadj.txt)
             if [[ $status = "Applying undervolt" ]]
             then
-                echo "Undervolt on" > "$HOME"/.local/bin/statusadj.txt
+                echo "Undervolt on" > "$HOME"/.local/share/ryzen_uv/statusadj.txt
             fi
         fi
     fi
@@ -75,5 +77,5 @@ else
     # 0x100000 - 0
     # ryzenadj --set-cogfx=0x100000
 
-    echo "Undervolt off" > "$HOME"/.local/bin/statusadj.txt
+    echo "Undervolt off" > "$HOME"/.local/share/ryzen_uv/statusadj.txt
 fi
