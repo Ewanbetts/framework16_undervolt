@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-RYZEN_UV_DIR="$HOME/.local/share/ryzen_uv"
+RYZEN_UV_DIR="__HOME__/.local/share/ryzen_uv"
 
 status=$(<"$RYZEN_UV_DIR/statusadj.txt")
 allow=$(<"$RYZEN_UV_DIR/allowadj.txt")
@@ -15,7 +15,7 @@ if [[ $allow = "1" ]]
 then
     if [[ $experimental = "1" ]]
     then
-        echo "0" > "$HOME"/.local/share/ryzen_uv/experimentaladj.txt
+        echo "0" > "$RYZEN_UV_DIR/experimentaladj.txt"
 
         # EXPERIMENTAL SECTION
         # Put experimental settings here - these
@@ -29,14 +29,14 @@ then
         # 0x100000 - 15 (Range: -30, 30)
         # ryzenadj --set-cogfx=0xFFFF0
 
-        echo "Experimental on" > "$HOME"/.local/share/ryzen_uv/statusadj.txt
+        echo "Experimental on" > "$RYZEN_UV_DIR/statusadj.txt"
     else
         # Fail safe to avoid repeated crashes at startup
         if [[ $status = "Applying undervolt" ]]
         then
             echo "WARNING: Last apply failed or still in progress - skipping"
         else
-            echo "Applying undervolt" > "$HOME"/.local/share/ryzen_uv/statusadj.txt
+            echo "Applying undervolt" > "$RYZEN_UV_DIR/statusadj.txt"
 
             # UNDERVOLT-ON SECTION
             # Put verified settings here.
@@ -56,10 +56,10 @@ then
             sleep 10
 
             # Only update status if still applying...
-            status=$(<"$HOME"/.local/share/ryzen_uv/statusadj.txt)
+            status=$(<"$RYZEN_UV_DIR/statusadj.txt")
             if [[ $status = "Applying undervolt" ]]
             then
-                echo "Undervolt on" > "$HOME"/.local/share/ryzen_uv/statusadj.txt
+                echo "Undervolt on" > "$RYZEN_UV_DIR/statusadj.txt"
             fi
         fi
     fi
@@ -77,5 +77,5 @@ else
     # 0x100000 - 0
     # ryzenadj --set-cogfx=0x100000
 
-    echo "Undervolt off" > "$HOME"/.local/share/ryzen_uv/statusadj.txt
+    echo "Undervolt off" > "$RYZEN_UV_DIR/statusadj.txt"
 fi
